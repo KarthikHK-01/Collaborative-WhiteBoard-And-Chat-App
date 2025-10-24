@@ -1,17 +1,31 @@
 import { useNavigate } from "react-router-dom";
 import {auth, provider} from "../config/firebase.js";
-import {signInWithPopup} from "firebase/auth"
+import {onAuthStateChanged, signInWithPopup} from "firebase/auth"
+import { useEffect } from "react";
 
 function Signup() {
   const navigate = useNavigate();
 
+  useEffect(() => {
+    const unsubscribe = onAuthStateChanged(auth, (user) => {
+      if(user) {
+        navigate("/home");
+      }
+    });
+    return () => unsubscribe();
+  }, [navigate]);
+
   const handleGoogleSignIn = async () => {
-    const result = await signInWithPopup(auth, provider);
-    const user = result.user;
+    try{
+      const result = await signInWithPopup(auth, provider);
+      const user = result.user;
+      const token = await user.getIdToken();
+      localStorage.setItem("token", token);
 
-    const token = await user.getIdToken();
-
-    localStorage.setItem("token", token);
+      navigate("/home");
+    } catch (err) {
+      console.log(err);
+    }
   }
 
   return (
@@ -20,7 +34,7 @@ function Signup() {
         className="flex-grow relative bg-center bg-no-repeat bg-cover flex items-center justify-center text-center px-4 w-full h-screen"
         style={{
           backgroundImage:
-            "url('https://static.vecteezy.com/system/resources/previews/024/113/823/non_2x/fun-colorful-abstract-background-in-doodle-style-creative-minimalist-hand-drawn-pattern-with-bright-cute-elements-simple-childish-scribble-backdrop-random-colorful-swirls-bundles-and-dots-vector.jpg')",
+            "url('/background.jpg')",
         }}
       >
         <div className="absolute inset-0 bg-black bg-opacity-30" />
