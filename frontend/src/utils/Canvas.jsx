@@ -1,6 +1,6 @@
 import React, { useRef, useState, useEffect } from "react";
 
-const DrawingCanvas = () => {
+const DrawingCanvas = (props) => {
   const canvasRef = useRef(null);
   const [isDrawing, setIsDrawing] = useState(false);
   const [tool, setTool] = useState("pen"); 
@@ -36,7 +36,7 @@ const DrawingCanvas = () => {
 
     if (tool === "pen") {
       ctx.globalCompositeOperation = "source-over"; 
-      ctx.strokeStyle = "black";
+      ctx.strokeStyle = props.color;
       ctx.lineWidth = 5;
     } else if (tool === "eraser") {
       ctx.globalCompositeOperation = "destination-out"; 

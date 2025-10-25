@@ -8,9 +8,9 @@ export function LandingPage () {
                 <h1 className="text-3xl text-white">TeamWrite</h1>
                 {/* <h1>Hello</h1> */}
                 <div className="flex justify-end items-center pr-[75px] w-full ">
-                    <button onClick = {() => (navigate("/signup"))} className="border border-white text-white hover:bg-blue-600 font-semibold py-2 px-6 rounded-lg transition duration-300">Login</button>
+                    <button onClick = {() => (navigate("/login"))} className="border border-white text-white hover:bg-blue-600 font-semibold py-2 px-6 rounded-lg transition duration-300">Login</button>
                     <div className="p-2"></div>
-                    <button onClick = {() => (navigate("/login"))} className="bg-white hover:bg-gray-200 text-black font-semibold py-2 px-6 rounded-lg transition duration-300">Sign Up</button>
+                    <button onClick = {() => (navigate("/signup"))} className="bg-white hover:bg-gray-200 text-black font-semibold py-2 px-6 rounded-lg transition duration-300">Sign Up</button>
                 </div>
             </div>
             <div className="flex justify-center items-center mt-[175px]">

@@ -1,10 +1,18 @@
 import { useNavigate } from "react-router-dom";
 import {auth, provider} from "../config/firebase.js";
 import {onAuthStateChanged, signInWithPopup} from "firebase/auth"
-import { useEffect } from "react";
+import { useEffect, useState } from "react";
+import axios from "axios";
 
 function Signup() {
   const navigate = useNavigate();
+  const [username, setUserName] = useState("");
+  const [name, setName] = useState("");
+  const [email, setEmail] = useState("");
+  const [password, setPassword] = useState("");
+  const [confirmPassword, setConfirmPassword] = useState("");
+  const [errMessage, setErrMessage] = useState("");
+
 
   useEffect(() => {
     const unsubscribe = onAuthStateChanged(auth, (user) => {
@@ -28,6 +36,25 @@ function Signup() {
     }
   }
 
+  const handleSignup = async () => {
+    try{
+      const result = await axios.post("http://localhost:9456/signup", {
+        name, username, email, password, confirmPassword
+      });
+
+      console.log(result);
+      localStorage.setItem("token", result.data.token);
+      setErrMessage("");
+      navigate("/home");
+    } catch(err) {
+      if(err.response && err.response.data && err.response.data.message) {
+        setErrMessage(err.response.data.message);
+      } else {
+        setErrMessage("Something went wrong. Try again later.");
+      }
+    }
+  }
+
   return (
     <div className="flex flex-col min-h-screen font-sans text-gray-900">
       <section
@@ -42,13 +69,40 @@ function Signup() {
         <div className="relative z-10 bg-white p-8 rounded-2xl shadow-lg w-[90%] max-w-md">
           <h1 className="text-3xl font-bold text-gray-800 mb-6">Sign Up</h1>
 
+          {errMessage && (
+            <div className="text-red-500 font-sm mb-4">{errMessage}</div>
+          )} 
+
+          <label className="block text-left mb-4">
+            <p className="text-lg font-medium mb-1">Name</p>
+            <input
+              type="text"
+              name="name"
+              placeholder="Enter your name"
+              className="w-full px-3 py-2 border border-gray-400 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
+              onChange={(e) => setName(e.target.value)}
+            />
+          </label>
+
           <label className="block text-left mb-4">
             <p className="text-lg font-medium mb-1">Username</p>
             <input
               type="text"
               name="username"
-              placeholder="Enter your name"
+              placeholder="Enter your username"
               className="w-full px-3 py-2 border border-gray-400 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
+              onChange={(e) => setUserName(e.target.value)}
+            />
+          </label>
+
+          <label className="block text-left mb-4">
+            <p className="text-lg font-medium mb-1">Email</p>
+            <input
+              type="text"
+              name="email"
+              placeholder="Enter your email"
+              className="w-full px-3 py-2 border border-gray-400 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
+              onChange={(e) => setEmail(e.target.value)}
             />
           </label>
 
@@ -59,6 +113,7 @@ function Signup() {
               name="password"
               placeholder="Enter password"
               className="w-full px-3 py-2 border border-gray-400 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
+              onChange={(e) => setPassword(e.target.value)}
             />
           </label>
 
@@ -69,6 +124,7 @@ function Signup() {
               name="confirm_password"
               placeholder="Confirm password"
               className="w-full px-3 py-2 border border-gray-400 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
+              onChange={(e) => setConfirmPassword(e.target.value)}
             />
           </label>
 
@@ -89,7 +145,7 @@ function Signup() {
 
           <button
             type="button"
-            onClick={() => navigate("/home")}
+            onClick={handleSignup}
             className="w-full bg-blue-700 hover:bg-blue-800 text-white font-semibold py-3 px-6 rounded-lg transition"
           >
             Sign Up
