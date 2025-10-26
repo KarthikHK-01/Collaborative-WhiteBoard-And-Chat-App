@@ -1,4 +1,5 @@
 import React, { useRef, useState, useEffect } from "react";
+import socket from "../config/socket";
 
 const DrawingCanvas = (props) => {
   const canvasRef = useRef(null);
@@ -6,6 +7,7 @@ const DrawingCanvas = (props) => {
   const [tool, setTool] = useState("pen"); 
   const [history, setHistory] = useState([]); 
   const [historyStep, setHistoryStep] = useState(-1);
+  const prevPosition = useRef({x: 0, y:0});
 
   useEffect(() => {
     const canvas = canvasRef.current;
@@ -27,6 +29,26 @@ const DrawingCanvas = (props) => {
     };
   };
 
+  useEffect(() => {
+
+    const canvas = canvasRef.current;
+    const ctx = canvas.getContext("2d");
+
+    socket.on("draw", (data) => {
+      const {fromX, fromY, toX, toY, color, lineWidth, tool} = data;
+
+      ctx.beginPath();
+      ctx.moveTo(fromX, fromY);
+      ctx.line(toX, toY);
+      ctx.strokeStyle = tool === "pen" ? color : "white";
+      ctx.lineWidth = lineWidth;
+      ctx.globalCompositeOperation = tool === "eraser" ? "destination-out" : "source-over";
+      ctx.stroke();
+    });
+
+    return (() => socket.off("draw"));
+  }, []);
+
   const startDrawing = (e) => {
     const ctx = canvasRef.current.getContext("2d");
     const { x, y } = getMousePos(e);
@@ -43,6 +65,8 @@ const DrawingCanvas = (props) => {
       ctx.lineWidth = 20;
     }
 
+    prevPosition.current = {x,y};
+
     setIsDrawing(true);
   };
 
@@ -50,8 +74,23 @@ const DrawingCanvas = (props) => {
     if (!isDrawing) return;
     const ctx = canvasRef.current.getContext("2d");
     const { x, y } = getMousePos(e);
+
+    const {x: fromX, y: fromY} = prevPosition.current;
+
     ctx.lineTo(x, y);
     ctx.stroke();
+
+    socket.emit("draw", {
+      fromX,
+      fromY,
+      x,
+      y,
+      color: props.color,
+      lineWidth,
+      tool
+    });
+
+    prevPosition.current = {x, y};
   };
 
   const stopDrawing = () => {
