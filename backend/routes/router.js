@@ -15,4 +15,6 @@ router.get("/hi", (req, res) => {
 router.post("/login", Login);
 router.post("/signup", Signup);
 
+// router.post("/home", Home);
+
 export default router;
