@@ -34,12 +34,22 @@ const DrawingCanvas = (props) => {
     const canvas = canvasRef.current;
     const ctx = canvas.getContext("2d");
 
+    socket.on("connection", () => {
+      console.log("Socket connected: ", socket.id);
+    })
+
     socket.on("draw", (data) => {
-      const {fromX, fromY, toX, toY, color, lineWidth, tool} = data;
+      const {fromX, fromY, x, y, color, lineWidth, tool} = data;
+      console.log("Received this :", data);
+
+      const nsX = fromX * canvas.width;   //normalised start X
+      const nsY = fromY * canvas.height;  //normalised start y
+      const neX = x * canvas.width;       //normalised end X
+      const neY = y * canvas.height;      //normalised end y
 
       ctx.beginPath();
-      ctx.moveTo(fromX, fromY);
-      ctx.line(toX, toY);
+      ctx.moveTo(nsX, nsY);
+      ctx.lineTo(neX, neY);
       ctx.strokeStyle = tool === "pen" ? color : "white";
       ctx.lineWidth = lineWidth;
       ctx.globalCompositeOperation = tool === "eraser" ? "destination-out" : "source-over";
@@ -72,7 +82,8 @@ const DrawingCanvas = (props) => {
 
   const draw = (e) => {
     if (!isDrawing) return;
-    const ctx = canvasRef.current.getContext("2d");
+    const canvas = canvasRef.current;
+    const ctx = canvas.getContext("2d");
     const { x, y } = getMousePos(e);
 
     const {x: fromX, y: fromY} = prevPosition.current;
@@ -81,12 +92,12 @@ const DrawingCanvas = (props) => {
     ctx.stroke();
 
     socket.emit("draw", {
-      fromX,
-      fromY,
-      x,
-      y,
+      fromX: fromX / canvas.width,
+      fromY: fromY / canvas.height,
+      x: x / canvas.width,
+      y: y / canvas.height,
       color: props.color,
-      lineWidth,
+      lineWidth: 5,
       tool
     });
 

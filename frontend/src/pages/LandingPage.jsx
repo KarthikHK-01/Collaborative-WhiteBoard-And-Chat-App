@@ -20,7 +20,7 @@ export function LandingPage () {
                     TeamWrite lets you and your friends draw together in real time. Whether you’re brainstorming,
                     storyboarding, or just having fun — your creativity belongs here.
                     </p>
-                    <button className="mt-8 bg-white font-bold rounded-full py-2 px-7 text-[20px]">Explore</button>
+                    <button className="mt-8 bg-white font-bold rounded-full py-2 px-7 text-[20px]" onClick={() => navigate("/login")}>Explore</button>
                 </div>
             </div>
 

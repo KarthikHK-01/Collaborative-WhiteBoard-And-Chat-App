@@ -30,7 +30,7 @@ function Signup() {
       const token = await user.getIdToken();
       localStorage.setItem("token", token);
 
-      navigate("/home");
+      navigate("/room");
     } catch (err) {
       console.log(err);
     }
@@ -45,7 +45,7 @@ function Signup() {
       console.log(result);
       localStorage.setItem("token", result.data.token);
       setErrMessage("");
-      navigate("/home");
+      navigate("/room");
     } catch(err) {
       if(err.response && err.response.data && err.response.data.message) {
         setErrMessage(err.response.data.message);
