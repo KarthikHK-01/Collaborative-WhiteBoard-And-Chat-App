@@ -22,8 +22,12 @@ export default function Home() {
       localStorage.removeItem("token");
       navigate("/");
     } catch(err) {
-      console.log("Couldn't sign out :)");
+      console.log("Couldn't sign out :)", err);
     }
+  }
+
+  const handleGoBack = () => {
+    navigate("/room");
   }
 
   const colors = [
@@ -38,7 +42,15 @@ export default function Home() {
     { value: "#6366f1", bg: "bg-indigo-500" },
     { value: "#1f2937", bg: "bg-gray-800" },
     { value: "#000000", bg: "bg-black" },
-    { value: "#9F22F3", bg: "bg-[#9F22F3]" }
+    { value: "#9F22F3", bg: "bg-[#9F22F3]" },
+    { value: "#0ea5e9", bg: "bg-sky-500" },      // Sky Blue  
+    { value: "#84cc16", bg: "bg-lime-500" },     // Lime Green  
+    { value: "#f43f5e", bg: "bg-rose-500" },     // Rose  
+    { value: "#10b981", bg: "bg-emerald-500" },  // Emerald  
+    { value: "#8b5cf6", bg: "bg-violet-500" },   // Violet  
+    { value: "#fb923c", bg: "bg-amber-400" },    // Amber  
+    { value: "#facc15", bg: "bg-yellow-400" },   // Bright Yellow  
+    { value: "#64748b", bg: "bg-slate-500" }
   ]
 
   return (
@@ -65,8 +77,9 @@ export default function Home() {
                 ></button>
               ))}
             </div>
-            <div className="pr-[20px]">
-              <button className="bg-red-500 p-3 rounded-lg" onClick={handleLogout}>Logout</button>
+            <div className="pl-[50px] pr-[20px]">
+              <button className="bg-red-500 p-3 rounded-lg text-white" onClick={handleLogout}>Logout</button>
+              <button className="bg-red-500 p-3 rounded-lg text-white mt-2" onClick={handleGoBack}>Go Back</button>
             </div>
           </div>
         </div>  

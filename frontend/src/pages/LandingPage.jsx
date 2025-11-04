@@ -1,7 +1,8 @@
-import { useNavigate } from "react-router-dom" 
+import { useNavigate } from "react-router-dom";
 
 export function LandingPage () {
     const navigate = useNavigate();
+    // console.log("generateRoomId = ", generatedRoomId);
     return (
         <div className="w-screen h-screen bg-blue-700">
             <div className="pl-[130px] pt-[30px] flex">

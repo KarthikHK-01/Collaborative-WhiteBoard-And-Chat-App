@@ -1,5 +1,6 @@
 import React, { useRef, useState, useEffect } from "react";
 import socket from "../config/socket";
+import { useRoom } from "../context/roomId";
 
 const DrawingCanvas = (props) => {
   const canvasRef = useRef(null);
@@ -8,6 +9,8 @@ const DrawingCanvas = (props) => {
   const [history, setHistory] = useState([]); 
   const [historyStep, setHistoryStep] = useState(-1);
   const prevPosition = useRef({x: 0, y:0});
+
+  const {roomId} = useRoom();
 
   useEffect(() => {
     const canvas = canvasRef.current;
@@ -38,10 +41,10 @@ const DrawingCanvas = (props) => {
       console.log("Socket connected: ", socket.id);
     })
 
-    socket.on("draw", (data) => {
+    socket.on("draw", ({roomId, data}) => {
       const {fromX, fromY, x, y, color, lineWidth, tool} = data;
       console.log("Received this :", data);
-
+      
       const nsX = fromX * canvas.width;   //normalised start X
       const nsY = fromY * canvas.height;  //normalised start y
       const neX = x * canvas.width;       //normalised end X
@@ -82,23 +85,29 @@ const DrawingCanvas = (props) => {
 
   const draw = (e) => {
     if (!isDrawing) return;
+    if(!prevPosition.current) return;
+
     const canvas = canvasRef.current;
     const ctx = canvas.getContext("2d");
     const { x, y } = getMousePos(e);
 
-    const {x: fromX, y: fromY} = prevPosition.current;
+    const {x: fromX, y: fromY} = prevPosition.current || {};
+    if(fromX === undefined || fromY === undefined) return;
 
     ctx.lineTo(x, y);
     ctx.stroke();
 
     socket.emit("draw", {
-      fromX: fromX / canvas.width,
-      fromY: fromY / canvas.height,
+      roomId,
+      data: {
+      fromX: fromX / canvas.width || 0,
+      fromY: fromY / canvas.height || 0,
       x: x / canvas.width,
       y: y / canvas.height,
       color: props.color,
       lineWidth: 5,
       tool
+    }
     });
 
     prevPosition.current = {x, y};

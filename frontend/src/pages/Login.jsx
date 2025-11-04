@@ -33,6 +33,9 @@ function Login () {
         const result = await signInWithPopup(auth, provider);
         const user = result.user;
         const token = await user.getIdToken();
+        const name = user.displayName;
+        
+        console.log(name);
         localStorage.setItem("token", token);
 
         navigate("/room");

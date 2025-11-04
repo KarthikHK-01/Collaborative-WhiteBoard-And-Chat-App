@@ -1,23 +1,57 @@
-import { useState } from "react"
+import { useEffect, useState } from "react"
+import socket from "../config/socket.js"
+import { useRoom } from "../context/roomId.jsx"
+import { useNavigate } from "react-router-dom"
+import { signOut } from "firebase/auth"
+import { auth } from "../config/firebase.js"
 
-export function Room() {
+function Room() {
+  const navigate = useNavigate()
+
   const [isCreateDialogOpen, setIsCreateDialogOpen] = useState(false)
-  const [roomId, setRoomId] = useState("")
   const [copied, setCopied] = useState(false)
+  const [generatedRoomId, setGeneratedRoomId] = useState("");
 
-    const makeID = () => {
-        var result = "";
-        var chars = "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789";
-        var len = chars.length;
+  const { roomId, setRoomId } = useRoom()
 
-        for(var i = 0; i < 8; i++) {
-            result += chars.charAt(Math.floor(Math.random() * len));
-        }
+  useEffect(() => {
+    socket.on("created-room", ({ roomId }) => {
+      setRoomId(roomId)
+      setIsCreateDialogOpen(false)
+      navigate("/home")
+    })
 
-        return result;
+    socket.on("joined-room", ({ roomId }) => {
+      console.log(`Joined Room: ${roomId}`)
+      setRoomId(roomId)
+      navigate("/home")
+    })
+
+    socket.on("error-message", ({ message }) => {
+      alert(message)
+    })
+
+    return () => {
+      socket.off("error-message")
+      socket.off("created-room")
+      socket.off("joined-room")
+    }
+  }, [])
+
+  const makeID = () => {
+    var result = ""
+    var chars = "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789"
+    var len = chars.length
+
+    for (var i = 0; i < 8; i++) {
+      result += chars.charAt(Math.floor(Math.random() * len))
     }
 
-    const generatedRoomId = makeID();
+    return result
+  }
+
+  // const generatedRoomId = makeID()
+
 
   const copyToClipboard = () => {
     navigator.clipboard.writeText(generatedRoomId)
@@ -25,68 +59,110 @@ export function Room() {
     setTimeout(() => setCopied(false), 2000)
   }
 
+  const handleLogout = async () => {
+    try{
+      console.log("signing out..");
+      await signOut(auth);
+      console.log("signed out");
+      localStorage.removeItem("token");
+      navigate("/");
+    } catch (err) {
+      console.log(err);
+    }
+  }
+
   return (
-    <div className="bg-blue-700 min-h-screen flex items-center justify-center p-4">
-      <div className="w-full max-w-md">
-        <div className="bg-white rounded-lg shadow-lg p-6 mb-4">
-          <h2 className="text-xl font-semibold mb-4 text-gray-800">Enter Room ID</h2>
-          <input
-            type="text"
-            placeholder="Room ID"
-            value={roomId}
-            onChange={(e) => setRoomId(e.target.value)}
-            className="w-full px-4 py-2 border border-gray-300 rounded-md mb-4 focus:outline-none focus:ring-2 focus:ring-blue-500"
-          />
-          <button className="w-full bg-blue-700 text-white py-2 px-4 rounded-md hover:bg-blue-800 transition">
-            Enter Room
-          </button>
-        </div>
-
+    <div className="bg-gradient-to-b from-blue-700 to-blue-600 min-h-screen flex flex-col p-4">
+      <div className="flex justify-between items-center mb-12 pt-4">
+        <h1 className="text-white text-2xl font-bold tracking-tight">Team Write</h1>
         <button
-          onClick={() => setIsCreateDialogOpen(true)}
-          className="w-full bg-white text-blue-700 py-3 px-4 rounded-md hover:bg-gray-100 transition font-semibold"
+          onClick={handleLogout}
+          className="px-4 py-2 bg-white text-blue-700 font-medium rounded-lg hover:bg-blue-50 transition-colors duration-200 shadow-sm hover:shadow-md"
         >
-          Create a Room
+          Logout
         </button>
+      </div>
 
-        {isCreateDialogOpen && (
-          <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center p-4 z-50">
-            <div className="bg-white rounded-lg shadow-lg p-6 w-full max-w-md">
-              <h2 className="text-xl font-semibold mb-4 text-gray-800">Create a Room</h2>
+      <div className="flex-1 flex items-center justify-center">
+        <div className="w-full max-w-md">
+          <div className="bg-white rounded-xl shadow-xl p-8 mb-4">
+            <h2 className="text-2xl font-bold mb-2 text-gray-900">Join a Room</h2>
+            <p className="text-gray-600 text-sm mb-6">Enter an existing room ID to connect</p>
 
-              <div className="mb-4">
-                <label className="block text-sm font-medium text-gray-700 mb-2">Room ID</label>
-                <div className="flex gap-2">
-                  <input
-                    type="text"
-                    value={generatedRoomId}
-                    readOnly
-                    className="flex-1 px-4 py-2 border border-gray-300 rounded-md bg-gray-50 focus:outline-none font-mono"
-                  />
+            <input
+              type="text"
+              placeholder="Room ID"
+              value={roomId}
+              onChange={(e) => setRoomId(e.target.value)}
+              className="w-full px-4 py-3 border border-gray-300 rounded-lg mb-4 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all"
+            />
+            <button
+              className="w-full bg-blue-700 text-white py-3 px-4 rounded-lg hover:bg-blue-800 transition-colors font-semibold shadow-md hover:shadow-lg"
+              onClick={() => {
+                socket.emit("join-room", { roomId })
+              }}
+            >
+              Enter Room
+            </button>
+          </div>
+
+          <button
+            onClick={() => {
+              setGeneratedRoomId(makeID());
+              setIsCreateDialogOpen(true);
+            }}
+            className="w-full bg-white text-blue-700 py-3 px-4 rounded-lg hover:bg-blue-50 transition-colors font-semibold border-2 border-white hover:border-blue-100 shadow-md hover:shadow-lg"
+          >
+            + Create a New Room
+          </button>
+
+          {isCreateDialogOpen && (
+            <div className="fixed inset-0 bg-black bg-opacity-40 flex items-center justify-center p-4 z-50">
+              <div className="bg-white rounded-xl shadow-2xl p-8 w-full max-w-md">
+                <h2 className="text-2xl font-bold mb-2 text-gray-900">Create a Room</h2>
+                <p className="text-gray-600 text-sm mb-6">Generate a new room ID to share</p>
+
+                <div className="mb-6">
+                  <label className="block text-sm font-semibold text-gray-700 mb-3">Your Room ID</label>
+                  <div className="flex gap-2">
+                    <input
+                      type="text"
+                      value={generatedRoomId}
+                      readOnly
+                      className="flex-1 px-4 py-3 border border-gray-300 rounded-lg bg-gray-50 focus:outline-none font-mono text-sm"
+                    />
+                    <button
+                      onClick={copyToClipboard}
+                      className="px-4 py-3 bg-blue-100 text-blue-700 rounded-lg hover:bg-blue-200 transition-colors font-medium"
+                    >
+                      {copied ? "✓ Copied" : "Copy"}
+                    </button>
+                  </div>
+                </div>
+
+                <div className="flex gap-3">
                   <button
-                    onClick={copyToClipboard}
-                    className="px-4 py-2 bg-gray-200 text-gray-800 rounded-md hover:bg-gray-300 transition"
+                    onClick={() => setIsCreateDialogOpen(false)}
+                    className="flex-1 bg-gray-100 text-gray-700 py-3 px-4 rounded-lg hover:bg-gray-200 transition-colors font-medium"
                   >
-                    {copied ? "Copied!" : "Copy"}
+                    Cancel
+                  </button>
+                  <button
+                    className="flex-1 bg-blue-700 text-white py-3 px-4 rounded-lg hover:bg-blue-800 transition-colors font-medium shadow-md hover:shadow-lg"
+                    onClick={() => {
+                      socket.emit("create-room", { roomId: generatedRoomId })
+                    }}
+                  >
+                    Create & Join
                   </button>
                 </div>
               </div>
-
-              <div className="flex gap-2">
-                <button
-                  onClick={() => setIsCreateDialogOpen(false)}
-                  className="flex-1 bg-gray-200 text-gray-800 py-2 px-4 rounded-md hover:bg-gray-300 transition"
-                >
-                  Cancel
-                </button>
-                <button className="flex-1 bg-blue-700 text-white py-2 px-4 rounded-md hover:bg-blue-800 transition">
-                  Join
-                </button>
-              </div>
             </div>
-          </div>
-        )}
+          )}
+        </div>
       </div>
     </div>
   )
 }
+
+export { Room }
