@@ -3,12 +3,14 @@ import {auth, provider} from "../config/firebase.js";
 import {signInWithPopup} from "firebase/auth"
 import { useState } from "react";
 import axios from "axios";
+import {useUser} from "../context/user";
 
 function Login () {
     const navigate = useNavigate();
     const [email, setEmail] = useState("");
     const [password, setPassword] = useState("");
     const [errMessage, setErrMessage] = useState("");
+    const {setName} = useUser();
 
     const handleLogin = async () => {
       try {
@@ -17,6 +19,7 @@ function Login () {
         });
 
         localStorage.setItem("token", result.data.token);
+        setName(result.data.name);
         navigate("/room");
       } catch(err) {
         if(err.response && err.response.data && err.response.data.message) {
@@ -37,7 +40,7 @@ function Login () {
         
         console.log(name);
         localStorage.setItem("token", token);
-
+        setName(name);
         navigate("/room");
       } catch (err) {
         console.log(err);

@@ -3,16 +3,18 @@ import {auth, provider} from "../config/firebase.js";
 import {onAuthStateChanged, signInWithPopup} from "firebase/auth"
 import { useEffect, useState } from "react";
 import axios from "axios";
+import { useUser } from "../context/user";
 
 function Signup() {
   const navigate = useNavigate();
   const [username, setUserName] = useState("");
-  const [name, setName] = useState("");
+  const [name, setNameName] = useState("");
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [confirmPassword, setConfirmPassword] = useState("");
   const [errMessage, setErrMessage] = useState("");
 
+  const {setName} = useUser();
 
   useEffect(() => {
     const unsubscribe = onAuthStateChanged(auth, (user) => {
@@ -28,8 +30,9 @@ function Signup() {
       const result = await signInWithPopup(auth, provider);
       const user = result.user;
       const token = await user.getIdToken();
+      const name = await user.displayName();
       localStorage.setItem("token", token);
-
+      setName(name);
       navigate("/room");
     } catch (err) {
       console.log(err);
@@ -45,6 +48,7 @@ function Signup() {
       console.log(result);
       localStorage.setItem("token", result.data.token);
       setErrMessage("");
+      setName(username);
       navigate("/room");
     } catch(err) {
       if(err.response && err.response.data && err.response.data.message) {
@@ -80,7 +84,7 @@ function Signup() {
               name="name"
               placeholder="Enter your name"
               className="w-full px-3 py-2 border border-gray-400 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
-              onChange={(e) => setName(e.target.value)}
+              onChange={(e) => setNameName(e.target.value)}
             />
           </label>
 

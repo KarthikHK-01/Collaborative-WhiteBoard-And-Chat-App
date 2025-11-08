@@ -1,6 +1,5 @@
 import React, { useRef, useState, useEffect } from "react";
 import socket from "../config/socket";
-import { useRoom } from "../context/roomId";
 
 const DrawingCanvas = (props) => {
   const canvasRef = useRef(null);
@@ -9,8 +8,11 @@ const DrawingCanvas = (props) => {
   const [history, setHistory] = useState([]); 
   const [historyStep, setHistoryStep] = useState(-1);
   const prevPosition = useRef({x: 0, y:0});
+  const roomId = props.roomId;
 
-  const {roomId} = useRoom();
+  // const {roomId} = useRoom();
+
+  // console.log("Canvas room: ", roomId);
 
   useEffect(() => {
     const canvas = canvasRef.current;

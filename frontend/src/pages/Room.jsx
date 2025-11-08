@@ -1,30 +1,29 @@
 import { useEffect, useState } from "react"
 import socket from "../config/socket.js"
-import { useRoom } from "../context/roomId.jsx"
 import { useNavigate } from "react-router-dom"
 import { signOut } from "firebase/auth"
 import { auth } from "../config/firebase.js"
 
 function Room() {
-  const navigate = useNavigate()
+  const navigate = useNavigate();
 
   const [isCreateDialogOpen, setIsCreateDialogOpen] = useState(false)
   const [copied, setCopied] = useState(false)
   const [generatedRoomId, setGeneratedRoomId] = useState("");
 
-  const { roomId, setRoomId } = useRoom()
-
+  const [roomId, setRoomId] = useState("");
+  
   useEffect(() => {
     socket.on("created-room", ({ roomId }) => {
-      setRoomId(roomId)
-      setIsCreateDialogOpen(false)
-      navigate("/home")
+      setRoomId(roomId);
+      setIsCreateDialogOpen(false);
+      navigate("/home", {state: {roomId}});
     })
 
     socket.on("joined-room", ({ roomId }) => {
       console.log(`Joined Room: ${roomId}`)
       setRoomId(roomId)
-      navigate("/home")
+      navigate("/home", {state: {roomId}});
     })
 
     socket.on("error-message", ({ message }) => {
