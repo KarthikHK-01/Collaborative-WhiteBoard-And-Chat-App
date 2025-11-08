@@ -20,7 +20,7 @@ async function Login(req, res) {
 
         const token = jwt.sign({email}, process.env.JWT_SECRET, {expiresIn: "2h"});
 
-        return res.status(200).json({message: "Login successful", token});
+        return res.status(200).json({message: "Login successful", token, name: user.username});
 
     } catch (err) {
         return res.status(400).json({message: err.message});
@@ -47,7 +47,7 @@ async function Signup (req, res) {
         
         const token = jwt.sign({email}, process.env.JWT_SECRET, {expiresIn: "2h"});
 
-        return res.status(200).json({message: "User added successfully", token});
+        return res.status(200).json({message: "User added successfully", token, name: username});
 
     }catch(err) {
         return res.status(400).json({message: `User couldnt be added due to ${err.message}`});
