@@ -12,8 +12,17 @@ const io = initSocket(server);
 
 socketHandler(io);
 
-app.use(cors());
-app.use("https://collaborative-whiteboard-hkxr.onrender.com/", router);
+app.use(
+  cors({
+    origin: [
+      "collaborative-white-board-amber.vercel.app",
+      "http://localhost:5173",
+    ],
+    methods: ["GET", "POST"],
+    credentials: true,
+  })
+);
+app.use("/", router);
 
 connectDB().then(() => {
     server.listen(9456, () => {
