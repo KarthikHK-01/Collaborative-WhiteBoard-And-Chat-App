@@ -22,10 +22,15 @@ app.use(
     credentials: true,
   })
 );
+
+app.use(express.json());
+app.use(express.urlencoded({extended: true}));
+
 app.use("/", router);
 
 connectDB().then(() => {
-    server.listen(9456, () => {
+    const PORT = 9456;
+    server.listen(PORT, () => {
         console.log("Server and socket connected running on 9456");
     })
 }).catch(() => {
