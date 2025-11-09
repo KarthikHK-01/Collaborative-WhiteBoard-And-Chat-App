@@ -24,7 +24,8 @@ export const socketHandler = (io) => {
             }
 
             if(!room) {
-                socket.emit("error-message", {message: `Room ID: ${roomId} not found. Creating one.....`});
+                socket.emit("error-message", {message: `Room ID: ${roomId} not found.`});
+                return;
             }
 
             socket.join(roomId);
