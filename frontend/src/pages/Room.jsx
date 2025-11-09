@@ -27,7 +27,8 @@ function Room() {
     })
 
     socket.on("error-message", ({ message }) => {
-      alert(message)
+      alert(message);
+      navigate("/room");
     })
 
     return () => {

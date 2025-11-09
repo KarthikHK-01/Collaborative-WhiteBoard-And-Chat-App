@@ -5,8 +5,8 @@ import Login from "./pages/Login";
 import Signup from "./pages/Signup";
 import Home from './pages/Home';
 import {Room} from './pages/Room';
-import { RoomProvider } from './context/roomId';
 import { UserProvider } from './context/user';
+import ProtectedRoute from './utils/ProtectedRoute';
 
 function App() {
   return(
@@ -16,8 +16,8 @@ function App() {
           <Route path="/" element={<LandingPage/>}/>
           <Route path="/signup" element={<Signup />}/>
           <Route path="/login" element={<Login />}/>
-          <Route path="/room" element={<Room/>}/>
-          <Route path="/home" element={<Home/>}/>
+          <Route path="/room" element={<ProtectedRoute><Room/></ProtectedRoute>}/>
+          <Route path="/home" element={<ProtectedRoute><Home/></ProtectedRoute>}/>
         </Routes>
       </UserProvider>
     </Router>
