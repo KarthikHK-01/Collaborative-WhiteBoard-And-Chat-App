@@ -13,7 +13,7 @@ const io = initSocket(server);
 socketHandler(io);
 
 app.use(cors());
-app.use("/", router);
+app.use("https://collaborative-whiteboard-hkxr.onrender.com/", router);
 
 connectDB().then(() => {
     server.listen(9456, () => {
