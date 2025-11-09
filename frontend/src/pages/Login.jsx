@@ -14,7 +14,7 @@ function Login () {
 
     const handleLogin = async () => {
       try {
-        const result = await axios.post("http://localhost:9456/login", {
+        const result = await axios.post("https://collaborative-whiteboard-hkxr.onrender.com/login", {
           email, password
         });
 

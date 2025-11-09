@@ -41,7 +41,7 @@ function Signup() {
 
   const handleSignup = async () => {
     try{
-      const result = await axios.post("http://localhost:9456/signup", {
+      const result = await axios.post("https://collaborative-whiteboard-hkxr.onrender.com/signup", {
         name, username, email, password, confirmPassword
       });
 
