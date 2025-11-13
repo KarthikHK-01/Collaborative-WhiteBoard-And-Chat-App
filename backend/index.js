@@ -17,7 +17,8 @@ socketHandler(io);
 
 const allowedOrigins = [
   "https://collaborative-white-board-amber.vercel.app",
-  "http://localhost:5173", 
+  "http://localhost:5173",
+  "https://collaborative-whiteboard-hkxr.onrender.com",
 ];
 
 app.use((req, res, next) => {
