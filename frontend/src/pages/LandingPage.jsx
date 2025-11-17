@@ -18,7 +18,7 @@ export function LandingPage () {
                 <div className="flex flex-col justify-center items-center text-center px-10">
                     <p className="text-white text-[60px] font-bold mb-5">CREATE. DRAW. REPEAT.</p>
                     <p className="text-white text-[30px] max-w-6xl">
-                    TeamWrite lets you and your friends draw together in real time. Whether you’re brainstorming,
+                    TeamWrite lets you and your friends draw together in real time, chat in real time. Whether you’re brainstorming,
                     storyboarding, or just having fun — your creativity belongs here.
                     </p>
                     <button className="mt-8 bg-white font-bold rounded-full py-2 px-7 text-[20px]" onClick={() => navigate("/login")}>Explore</button>
