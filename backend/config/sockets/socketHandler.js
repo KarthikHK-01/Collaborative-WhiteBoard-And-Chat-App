@@ -6,7 +6,7 @@ export const socketHandler = (io) => {
         console.log("Connected to ", socket.id);
 
         socket.on("join-room", ({roomId, name}) => {
-            console.log(`🟢 JOIN EVENT: room=${roomId}, name=${name}, socket=${socket.id}`);
+            console.log(`JOIN EVENT: room=${roomId}, name=${name}, socket=${socket.id}`);
             const room = io.sockets.adapter.rooms.get(roomId);
 
             if(!rooms[roomId]) {
